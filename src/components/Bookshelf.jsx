@@ -14,16 +14,34 @@ const [newBook, setNewBook] = useState({
 
 const handleInputChange = (event) => {
     setNewBook({...newBook, [event.target.name]: event.target.value})
+    checkErrors(event)
 }
 
 const handleSubmit = (event) => {
     event.preventDefault();
-    setBooks({...books, newBook})
+    setBooks([...books, newBook])
     setNewBook({
         title: "",
         author: "",
     })
 };
+
+const [errors, setErrors] = useState({
+    title: "",
+    author: "",
+});
+
+const checkErrors = ({target}) => {
+    if(target.name === "author") {
+        setErrors({
+            ...errors,
+            author: target.value.toLowerCase() === newBook.title.toLowerCase() ? `Author cannot be the same as title` : "",
+        });
+    }};
+
+const formIsInvalid = Object.values(errors).some(Boolean);
+const formHasMissingData = !newBook.title.trim() || !newBook.author.trim()
+  
 
 return(
 <div className="bookshelfDiv">
@@ -37,8 +55,9 @@ return(
         <div className="author">
         <label htmlFor="author">Author: </label>
         <input id="author" name="author" value={newBook.author} onChange={handleInputChange}/>
+        {errors.author && <p className="error">{errors.author}</p>}
         </div>
-        <button>Add Book</button>
+        <button type="submit" disabled={formIsInvalid || formHasMissingData}>Add Book</button>
     </form>
   </div>
   <div className="bookCardsDiv">
